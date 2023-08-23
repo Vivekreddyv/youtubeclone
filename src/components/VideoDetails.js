@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactPlayer from 'react-player/youtube';
 import { BsFillCheckCircleFill } from 'react-icons/bs';
@@ -18,28 +18,29 @@ const VideoDetails = () => {
 	const { id } = useParams();
 	const { loading, setLoading } = useContext(Context);
 
-	useEffect(() => {
-		document.getElementById('root').classList.add('custom-h');
-		fetchVideoDetails();
-		fetchRelatedVideoDetails();
-	}, [id]);
+	
 
-	const fetchVideoDetails = () => {
+	const fetchVideoDetails =useCallback( () => {
 		setLoading(true);
 		fetchDataFromApi(`video/details/?id=${id}`).then(res => {
 			console.log(res);
 			setVideo(res);
 			setLoading(false);
 		});
-	};
-	const fetchRelatedVideoDetails = () => {
+	},[id,setLoading])
+	const fetchRelatedVideoDetails = useCallback(() => {
 		setLoading(true);
 		fetchDataFromApi(`video/related-contents/?id=${id}`).then(res => {
 			console.log(res);
 			setRelatedVideos(res);
 			setLoading(false);
 		});
-	};
+	},[id,setLoading])
+	useEffect(() => {
+		document.getElementById('root').classList.add('custom-h');
+		fetchVideoDetails();
+		fetchRelatedVideoDetails();
+	}, [id,fetchVideoDetails, fetchRelatedVideoDetails]);
 
 	return (
 		<div className="flex justify-center flex-row h-[calc(100%-56px)] bg-black">
